@@ -41,7 +41,7 @@ func getGachaLogByType(args *RequestArgs, gachaType int) (*GachaList, error) {
 			fmt.Printf("get err: %v\n", err)
 		}
 		characterGachaLog = append(characterGachaLog, *gachaLog...)
-		time.Sleep(time.Millisecond * 200)
+		time.Sleep(time.Millisecond * 300)
 
 		size := len(*gachaLog)
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,51 +16,61 @@ type StoreData struct {
 
 func mergeLocalGachaLog(gachaLogList ...*GachaList) {
 
-	// 尝试通过新记录获取 uid
-	var uid string
+	var uid = getUidByNewGachaLogList(gachaLogList...)
+
+	var storeData StoreData = *readFromFile(uid)
+
+	for i, gachaLog := range gachaLogList {
+		switch i {
+		case 0:
+			storeData.CharacterGachaLog = merge(storeData.CharacterGachaLog, gachaLog)
+			characterResult := Analysis(storeData.CharacterGachaLog, "角色活动祈愿")
+			characterResult.Print()
+		case 1:
+			storeData.WeaponGachaLog = merge(storeData.WeaponGachaLog, gachaLog)
+			weaponResult := Analysis(storeData.WeaponGachaLog, "武器活动祈愿")
+			weaponResult.Print()
+
+		case 2:
+			storeData.OrdinaryGachaLog = merge(storeData.OrdinaryGachaLog, gachaLog)
+			ordinaryResult := Analysis(storeData.OrdinaryGachaLog, "普通活动祈愿")
+			ordinaryResult.Print()
+		}
+	}
+
+	saveToFile(&storeData, uid)
+}
+
+func getUidByNewGachaLogList(gachaLogList ...*GachaList) (uid string) {
 	for _, gachaLog := range gachaLogList {
 		if len(*gachaLog) == 0 {
 			continue
 		}
 
 		if uid == "" {
-			uid = (*gachaLog)[0].Uid
+			return (*gachaLog)[0].Uid
 		}
 	}
 
-	// 查询本地对应 uid 的记录
-	var storeData StoreData = *readFromFile(uid)
-
-	// 合并
-	for i, gachaLog := range gachaLogList {
-		switch i {
-		case 0:
-			storeData.CharacterGachaLog = merge(storeData.CharacterGachaLog, gachaLog)
-		case 1:
-			storeData.WeaponGachaLog = merge(storeData.WeaponGachaLog, gachaLog)
-		case 2:
-			storeData.OrdinaryGachaLog = merge(storeData.OrdinaryGachaLog, gachaLog)
-		}
-	}
-
-	// 保存
-	saveToFile(&storeData, uid)
+	return ""
 }
 
-func merge(old, src *GachaList) (new *GachaList) {
-	new = old
+func merge(old, src *GachaList) *GachaList {
+	new := *old
 
 	for _, v := range *src {
 		if len(*old) == 0 || v.Id > (*old)[len(*old)-1].Id {
-			*new = append(*new, v)
+			println("merge", v.Id)
+			new = append(new, v)
 		}
 	}
 
-	return new
+	return &new
 }
 
 func readFromFile(uid string) *StoreData {
-	// 无法从新记录中找到 uid
+	// new gacha data is completely empty
+	// have not uid
 	if uid == "" {
 		return &StoreData{
 			CharacterGachaLog: &GachaList{},
@@ -70,7 +81,7 @@ func readFromFile(uid string) *StoreData {
 
 	f, err := os.Open(filepath.Join(".", uid+".json"))
 	if err != nil {
-		// 本地没有 uid 对应的记录
+		// the uid have no local gacha log
 		if os.IsNotExist(err) {
 			return &StoreData{
 				CharacterGachaLog: &GachaList{},
@@ -79,12 +90,18 @@ func readFromFile(uid string) *StoreData {
 			}
 		}
 	}
-	defer f.Close()
 
-	// 从本地对应 uid 记录中读取数据
+	// read data from local file by uid
 	dataByte, _ := ioutil.ReadAll(f)
 	storeData := &StoreData{}
 	json.Unmarshal(dataByte, storeData)
+
+	// rename old data file
+	f.Close()
+	err = os.Rename(filepath.Join(".", uid+".json"), filepath.Join(".", uid+".bak"))
+	if err != nil {
+		fmt.Printf("rename old file err: %v\n", err)
+	}
 
 	return storeData
 }
@@ -100,4 +117,10 @@ func saveToFile(storeData *StoreData, uid string) {
 
 	dataByte, _ := json.Marshal(storeData)
 	f.Write(dataByte)
+
+	// delete bak file
+	err = os.Remove(filepath.Join(".", uid+".bak"))
+	if err != nil {
+		fmt.Printf("delete bak file err: %v\n", err)
+	}
 }
