@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"syscall"
+	"time"
 )
 
 type FinalResult struct {
@@ -22,9 +24,18 @@ func (r *FinalResult) OutputHTML() {
 
 	// automatically open browser
 	url := "file://" + filepath.Join(getCurrentAbPath(), "output.html")
-	cmd := exec.Command(`cmd`, `/c`, `start`, url)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	cmd := exec.CommandContext(ctx, `cmd`, `/c`, `start`, url)
 	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
 	cmd.Start()
+
+	fmt.Printf("Automatically open browser......\n")
+	time.Sleep(10 * time.Second)
+
+	cancel()
+
+	cmd.Wait()
 }
 
 type Result struct {
