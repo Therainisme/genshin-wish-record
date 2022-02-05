@@ -19,25 +19,28 @@ func mergeLocalGachaLog(gachaLogList ...*GachaList) {
 	var uid = getUidByNewGachaLogList(gachaLogList...)
 
 	var storeData StoreData = *readFromFile(uid)
+	var finalResult = &FinalResult{
+		CharacterGachaResult: &Result{},
+		WeaponGachaResult:    &Result{},
+		OrdinaryGachaResult:  &Result{},
+	}
 
 	for i, gachaLog := range gachaLogList {
 		switch i {
 		case 0:
 			storeData.CharacterGachaLog = merge(storeData.CharacterGachaLog, gachaLog)
-			characterResult := Analysis(storeData.CharacterGachaLog, "角色活动祈愿")
-			characterResult.Print()
+			finalResult.CharacterGachaResult = Analysis(storeData.CharacterGachaLog, "角色活动祈愿")
 		case 1:
 			storeData.WeaponGachaLog = merge(storeData.WeaponGachaLog, gachaLog)
-			weaponResult := Analysis(storeData.WeaponGachaLog, "武器活动祈愿")
-			weaponResult.Print()
+			finalResult.WeaponGachaResult = Analysis(storeData.WeaponGachaLog, "武器活动祈愿")
 
 		case 2:
 			storeData.OrdinaryGachaLog = merge(storeData.OrdinaryGachaLog, gachaLog)
-			ordinaryResult := Analysis(storeData.OrdinaryGachaLog, "普通活动祈愿")
-			ordinaryResult.Print()
+			finalResult.OrdinaryGachaResult = Analysis(storeData.OrdinaryGachaLog, "常驻祈愿")
 		}
 	}
 
+	finalResult.OutputHTML()
 	saveToFile(&storeData, uid)
 }
 
@@ -60,7 +63,6 @@ func merge(old, src *GachaList) *GachaList {
 
 	for _, v := range *src {
 		if len(*old) == 0 || v.Id > (*old)[len(*old)-1].Id {
-			println("merge", v.Id)
 			new = append(new, v)
 		}
 	}

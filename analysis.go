@@ -1,6 +1,22 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"html/template"
+	"os"
+)
+
+type FinalResult struct {
+	CharacterGachaResult *Result
+	WeaponGachaResult    *Result
+	OrdinaryGachaResult  *Result
+}
+
+func (r *FinalResult) OutputHTML() {
+	tmpl := template.Must(template.ParseFiles("output.template.html"))
+	f, _ := os.Create("output.html")
+	tmpl.Execute(f, r)
+}
 
 type Result struct {
 	GachaName   string
@@ -38,6 +54,7 @@ func (r *Result) Print() {
 func Analysis(gachaLog *GachaList, gachaName string) *Result {
 	luckList := make(LuckList, 0)
 	idx := 0
+	totalFiveStar := 0
 	for _, v := range *gachaLog {
 		idx++
 
@@ -48,6 +65,7 @@ func Analysis(gachaLog *GachaList, gachaName string) *Result {
 				Type:  "5",
 			})
 
+			totalFiveStar++
 			idx = 0
 		} else if v.RankType == "4" {
 			luckList = append(luckList, Luck{
@@ -60,7 +78,7 @@ func Analysis(gachaLog *GachaList, gachaName string) *Result {
 
 	return &Result{
 		GachaName:   gachaName,
-		AverageLuck: 0, // todo
+		AverageLuck: Decimal(float64(len(*gachaLog)-idx) / float64(totalFiveStar)),
 		Total:       len(*gachaLog),
 		Unluck:      idx,
 		LuckList:    luckList,
