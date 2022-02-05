@@ -23,11 +23,16 @@ func (r *Result) Print() {
 	fmt.Printf("Total: %d\n", r.Total)
 
 	for _, v := range r.LuckList {
-		fmt.Printf("%d: %s\n", v.Index, v.Name)
+		switch v.Type {
+		case "5":
+			fmt.Printf("\033[1;33;40m[%d]%s\033[0m ", v.Index, v.Name)
+		case "4":
+			fmt.Printf("\033[1;35;40m[%d]%s\033[0m ", v.Index, v.Name)
+		}
 	}
 
-	fmt.Printf("已经有%d未出金\n", r.Unluck)
-	fmt.Printf("-------------------\n")
+	fmt.Printf("\n已经有%d未出金\n", r.Unluck)
+	fmt.Printf("\n")
 }
 
 func Analysis(gachaLog *GachaList, gachaName string) *Result {
@@ -40,10 +45,16 @@ func Analysis(gachaLog *GachaList, gachaName string) *Result {
 			luckList = append(luckList, Luck{
 				Index: idx,
 				Name:  v.Name,
-				Type:  "", // todo
+				Type:  "5",
 			})
 
 			idx = 0
+		} else if v.RankType == "4" {
+			luckList = append(luckList, Luck{
+				Index: idx,
+				Name:  v.Name,
+				Type:  "4",
+			})
 		}
 	}
 
