@@ -14,34 +14,25 @@ type StoreData struct {
 	OrdinaryGachaLog  *GachaList `json:"ordinary_gacha_log"`
 }
 
-func mergeLocalGachaLog(gachaLogList ...*GachaList) {
+func mergeLocalGachaLog(gachaLogList ...*GachaList) (storeData *StoreData) {
 
 	var uid = getUidByNewGachaLogList(gachaLogList...)
 
-	var storeData StoreData = *readFromFile(uid)
-	var finalResult = &FinalResult{
-		CharacterGachaResult: &Result{},
-		WeaponGachaResult:    &Result{},
-		OrdinaryGachaResult:  &Result{},
-	}
+	storeData = readFromFile(uid)
 
 	for i, gachaLog := range gachaLogList {
 		switch i {
 		case 0:
 			storeData.CharacterGachaLog = merge(storeData.CharacterGachaLog, gachaLog)
-			finalResult.CharacterGachaResult = Analysis(storeData.CharacterGachaLog, "角色活动祈愿")
 		case 1:
 			storeData.WeaponGachaLog = merge(storeData.WeaponGachaLog, gachaLog)
-			finalResult.WeaponGachaResult = Analysis(storeData.WeaponGachaLog, "武器活动祈愿")
-
 		case 2:
 			storeData.OrdinaryGachaLog = merge(storeData.OrdinaryGachaLog, gachaLog)
-			finalResult.OrdinaryGachaResult = Analysis(storeData.OrdinaryGachaLog, "常驻祈愿")
 		}
 	}
 
-	finalResult.OutputHTML()
-	saveToFile(&storeData, uid)
+	saveToFile(storeData, uid)
+	return storeData
 }
 
 func getUidByNewGachaLogList(gachaLogList ...*GachaList) (uid string) {
@@ -122,7 +113,7 @@ func saveToFile(storeData *StoreData, uid string) {
 
 	// delete bak file
 	err = os.Remove(filepath.Join(".", uid+".bak"))
-	if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		fmt.Printf("delete bak file err: %v\n", err)
 	}
 }

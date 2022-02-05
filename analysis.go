@@ -60,7 +60,7 @@ func (r *Result) Print() {
 	fmt.Printf("\n")
 }
 
-func Analysis(gachaLog *GachaList, gachaName string) *Result {
+func analysisGachaLog(gachaLog *GachaList, gachaName string) *Result {
 	luckList := make(LuckList, 0)
 	idx := 0
 	totalFiveStar := 0
@@ -91,5 +91,13 @@ func Analysis(gachaLog *GachaList, gachaName string) *Result {
 		Total:       len(*gachaLog),
 		Unluck:      idx,
 		LuckList:    luckList,
+	}
+}
+
+func analysisStoreData(storeData *StoreData) (finalResult *FinalResult) {
+	return &FinalResult{
+		CharacterGachaResult: analysisGachaLog(storeData.CharacterGachaLog, "角色活动祈愿"),
+		WeaponGachaResult:    analysisGachaLog(storeData.WeaponGachaLog, "武器活动祈愿"),
+		OrdinaryGachaResult:  analysisGachaLog(storeData.OrdinaryGachaLog, "常驻祈愿"),
 	}
 }

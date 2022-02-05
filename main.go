@@ -4,5 +4,8 @@ func main() {
 	r := parseArgs(testURL)
 	characterGachaLog, weaponGachaLog, ordinaryGachaLog := getGachaLog(r)
 
-	mergeLocalGachaLog(characterGachaLog, weaponGachaLog, ordinaryGachaLog)
+	storeData := mergeLocalGachaLog(characterGachaLog, weaponGachaLog, ordinaryGachaLog)
+
+	finalResult := analysisStoreData(storeData)
+	finalResult.OutputHTML()
 }
