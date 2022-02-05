@@ -13,7 +13,7 @@ type FinalResult struct {
 }
 
 func (r *FinalResult) OutputHTML() {
-	tmpl := template.Must(template.ParseFiles("output.template.html"))
+	tmpl := template.Must(template.New("result").Parse(templateHTML))
 	f, _ := os.Create("output.html")
 	tmpl.Execute(f, r)
 }

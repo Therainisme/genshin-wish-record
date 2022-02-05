@@ -2,3 +2,4 @@ config.go
 *.bak
 *.json
 output.html
+output.template.html

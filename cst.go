@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+package main
+
+const templateHTML = `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -44,7 +46,7 @@
     <div style="margin-bottom: 20px;">
         {{ range $index, $luck := .CharacterGachaResult.LuckList }}
         {{if eq $luck.Type "5"}}
-        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
+        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span><br>
         {{end}}
         {{if eq $luck.Type "4"}}
         <span class="four-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
@@ -58,7 +60,7 @@
     <div style="margin-bottom: 20px;">
         {{ range $index, $luck := .WeaponGachaResult.LuckList }}
         {{if eq $luck.Type "5"}}
-        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
+        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span><br>
         {{end}}
         {{if eq $luck.Type "4"}}
         <span class="four-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
@@ -72,7 +74,7 @@
     <div style="margin-bottom: 20px;">
         {{ range $index, $luck := .OrdinaryGachaResult.LuckList }}
         {{if eq $luck.Type "5"}}
-        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
+        <span class="five-star">[{{ $luck.Index }}]{{ $luck.Name }}</span><br>
         {{end}}
         {{if eq $luck.Type "4"}}
         <span class="four-star">[{{ $luck.Index }}]{{ $luck.Name }}</span>
@@ -81,4 +83,4 @@
     </div>
 </body>
 
-</html>
+</html>`
