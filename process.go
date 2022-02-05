@@ -28,27 +28,22 @@ func getGachaLogByUrl(url string) (gachaLog *GachaList, err error) {
 	return &r.Data.List, nil
 }
 
-func getCharacterGachaLog(args *RequestArgs) {
-	gachaType := 301
+func getGachaLogByType(args *RequestArgs, gachaType int) (*GachaList, error) {
 	page := 1
 	endId := "0"
-	times := 0
+	characterGachaLog := make(GachaList, 0)
 	for {
 		url, _ := getGachaLogUrl(args, gachaType, page, endId)
+		// todo: error handle
+
 		gachaLog, err := getGachaLogByUrl(url)
-		time.Sleep(time.Millisecond * 500)
 		if err != nil {
 			fmt.Printf("get err: %v\n", err)
 		}
+		characterGachaLog = append(characterGachaLog, *gachaLog...)
+		time.Sleep(time.Millisecond * 200)
 
 		size := len(*gachaLog)
-
-		for _, v := range *gachaLog {
-			times++
-			if v.RankType == "4" || v.RankType == "5" {
-				println(times, v.Name, v.Time)
-			}
-		}
 
 		if size < 20 {
 			break
@@ -56,6 +51,31 @@ func getCharacterGachaLog(args *RequestArgs) {
 
 		page++
 		endId = (*gachaLog)[size-1].Id
-
 	}
+
+	ReverseSlice(characterGachaLog)
+
+	return &characterGachaLog, nil
+}
+
+func getGachaLog(args *RequestArgs) (characterGachaLog *GachaList, weaponGachaLog *GachaList, ordinaryGachaLog *GachaList) {
+	// 角色活动祈愿 301
+	characterGachaLog, err := getGachaLogByType(args, 301)
+	if err != nil {
+		fmt.Printf("get character gacha log err: %v\n", err)
+	}
+
+	// 武器活动祈愿 302
+	weaponGachaLog, err = getGachaLogByType(args, 302)
+	if err != nil {
+		fmt.Printf("get weapon gacha log err: %v\n", err)
+	}
+
+	// 常驻祈愿 200
+	ordinaryGachaLog, err = getGachaLogByType(args, 200)
+	if err != nil {
+		fmt.Printf("get ordinary gacha log err: %v\n", err)
+	}
+
+	return characterGachaLog, weaponGachaLog, ordinaryGachaLog
 }
