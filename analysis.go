@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"html/template"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
 )
 
 type FinalResult struct {
@@ -16,6 +19,12 @@ func (r *FinalResult) OutputHTML() {
 	tmpl := template.Must(template.New("result").Parse(templateHTML))
 	f, _ := os.Create("output.html")
 	tmpl.Execute(f, r)
+
+	// automatically open browser
+	url := "file://" + filepath.Join(getCurrentAbPath(), "output.html")
+	cmd := exec.Command(`cmd`, `/c`, `start`, url)
+	cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	cmd.Start()
 }
 
 type Result struct {
