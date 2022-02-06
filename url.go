@@ -74,8 +74,8 @@ func parseArgs(str string) *RequestArgs {
 	return &r
 }
 
-func getGachaLogUrl(args *RequestArgs, gachaType int, page int, endId string) (string, error) {
+func getGachaLogUrl(args *RequestArgs, gachaType int, page int, endId string) string {
 	args.EndId = endId
 	str := fmt.Sprintf("%s?%s&page=%d&gacha_type=%d&size=20", RequestUrl, url.Values(*args.ToUrlValues()).Encode(), page, gachaType)
-	return str, nil
+	return str
 }
