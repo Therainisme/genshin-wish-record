@@ -1,9 +1,15 @@
 package main
 
 func main() {
-	userHomeDir := getUserHomeDir()
-	genshinLogFilePath := getGenshinLogFilePath(userHomeDir)
-	url := getUrlFromGenshinLogFile(genshinLogFilePath)
+	var url string
+
+	if *mobile != "" {
+		url = *mobile
+	} else {
+		userHomeDir := getUserHomeDir()
+		genshinLogFilePath := getGenshinLogFilePath(userHomeDir)
+		url = getUrlFromGenshinLogFile(genshinLogFilePath)
+	}
 
 	args := parseArgs(url)
 	characterGachaLog, weaponGachaLog, ordinaryGachaLog := getGachaLog(args)
