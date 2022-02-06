@@ -20,11 +20,11 @@ go build .
 
 ### PC
 
-在本地运行原神，打开到祈愿的历史记录页面即可。
+在本地运行原神，打开到祈愿的历史记录页面。
 
 ![pc-history](https://user-images.githubusercontent.com/41776735/152675521-e104c9aa-f54b-46b8-8b66-b17fbea5a160.png)
 
-接着直接运行编译后的二进制文件即可，程序会自动打开 output.html。（如果它不自动，自己打开也可以）
+接着直接运行编译后的二进制文件，程序会自动打开 output.html。（如果它不自动，自己打开也可以）
 
 ```shell
 .\gwr.exe
